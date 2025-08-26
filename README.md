@@ -1,14 +1,14 @@
-# set
+# densemap
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/jokruger/set.svg)](https://pkg.go.dev/github.com/jokruger/set)
-[![Go Report Card](https://goreportcard.com/badge/github.com/jokruger/set)](https://goreportcard.com/report/github.com/jokruger/set)
-[![codecov](https://codecov.io/gh/jokruger/set/graph/badge.svg?token=AEO9BNJ069)](https://codecov.io/gh/jokruger/set)
+[![Go Reference](https://pkg.go.dev/badge/github.com/jokruger/densemap.svg)](https://pkg.go.dev/github.com/jokruger/densemap)
+[![Go Report Card](https://goreportcard.com/badge/github.com/jokruger/densemap)](https://goreportcard.com/report/github.com/jokruger/densemap)
+[![codecov](https://codecov.io/gh/jokruger/densemap/graph/badge.svg?token=Q136FDHBFJ)](https://codecov.io/gh/jokruger/densemap)
 
-A simple and efficient Go package providing a generic set data structure. Supports fast membership checks, addition, removal, and common set operations for any comparable type. Ideal for use cases requiring unique collections and mathematical set logic.
+Package densemap provides a generic, dense, ID-based mapping structure for fast, contiguous lookups by integer ID. Unlike Go’s built-in map, densemap stores values in a slice indexed by a bounded integer range [minID, maxID]. This design ensures O(1) access, efficient iteration, and predictable memory usage, making it well-suited for cases where IDs are compact and naturally bounded (e.g., enums, small identifier spaces, event codes).
 
 ## Install
 
-Run `go get github.com/jokruger/set`
+Run `go get github.com/jokruger/densemap`
 
 ## License
 
