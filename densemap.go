@@ -53,6 +53,21 @@ func (dm *DenseMap[ID, T]) Set(id ID, value T) error {
 	return nil
 }
 
+// Delete removes the value associated with the ID and marks it as invalid.
+func (dm *DenseMap[ID, T]) Delete(id ID) error {
+	if id < dm.minID || id > dm.maxID {
+		return fmt.Errorf("ID %v out of range [%v, %v]", id, dm.minID, dm.maxID)
+	}
+	offset := int(id - dm.minID)
+	if dm.exists[offset] {
+		dm.exists[offset] = false
+		var zero T
+		dm.values[offset] = zero
+		dm.count--
+	}
+	return nil
+}
+
 // Get retrieves the value associated with the ID. Returns (value, true) if set, otherwise (zero, false).
 func (dm *DenseMap[ID, T]) Get(id ID) (T, bool) {
 	if id < dm.minID || id > dm.maxID {
@@ -85,6 +100,11 @@ func (dm *DenseMap[ID, T]) Len() int {
 	return dm.count
 }
 
+// IsEmpty returns true if no elements are set.
+func (dm *DenseMap[ID, T]) IsEmpty() bool {
+	return dm.count == 0
+}
+
 // Contains returns true if value is set for a given ID.
 func (dm *DenseMap[ID, T]) Contains(id ID) bool {
 	if id < dm.minID || id > dm.maxID {
@@ -102,4 +122,57 @@ func (dm *DenseMap[ID, T]) ForEach(fn func(id ID, value T)) {
 			fn(id, dm.values[i])
 		}
 	}
+}
+
+// Clear resets the DenseMap, removing all set values.
+func (dm *DenseMap[ID, T]) Clear() {
+	for i := range dm.exists {
+		dm.exists[i] = false
+		var zero T
+		dm.values[i] = zero
+	}
+	dm.count = 0
+}
+
+// Range iterates over a specified range of IDs, applying the provided function to each set value within that range.
+func (dm *DenseMap[ID, T]) Range(min, max ID, fn func(id ID, value T)) {
+	if min > max {
+		min, max = max, min
+	}
+	if min < dm.minID {
+		min = dm.minID
+	}
+	if max > dm.maxID {
+		max = dm.maxID
+	}
+	for id := min; id <= max; id++ {
+		offset := int(id - dm.minID)
+		if dm.exists[offset] {
+			fn(id, dm.values[offset])
+		}
+	}
+}
+
+// First returns the first set ID and its associated value, or (zeroID, nil) if none are set.
+func (dm *DenseMap[ID, T]) First() (ID, *T) {
+	for i, exists := range dm.exists {
+		if exists {
+			id := dm.minID + ID(i)
+			return id, &dm.values[i]
+		}
+	}
+	var zeroID ID
+	return zeroID, nil
+}
+
+// Last returns the last set ID and its associated value, or (zeroID, nil) if none are set.
+func (dm *DenseMap[ID, T]) Last() (ID, *T) {
+	for i := len(dm.exists) - 1; i >= 0; i-- {
+		if dm.exists[i] {
+			id := dm.minID + ID(i)
+			return id, &dm.values[i]
+		}
+	}
+	var zeroID ID
+	return zeroID, nil
 }

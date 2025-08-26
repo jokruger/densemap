@@ -162,3 +162,108 @@ func TestForEach(t *testing.T) {
 		t.Errorf("Expected ForEach to iterate 2 times, got %d", count)
 	}
 }
+
+func TestAddRemove(t *testing.T) {
+	dm := New[uint16, string](1, 5)
+	dm.Set(3, "3")
+	dm.Set(5, "5")
+
+	if dm.Len() != 2 {
+		t.Errorf("Expected length to be 2, got %d", dm.Len())
+	}
+	if !dm.Contains(3) {
+		t.Errorf("Expected to contain ID 3")
+	}
+	if !dm.Contains(5) {
+		t.Errorf("Expected to contain ID 5")
+	}
+	if dm.Contains(10) {
+		t.Errorf("Expected to not contain ID 10")
+	}
+	if dm.Contains(2) {
+		t.Errorf("Expected to not contain ID 2")
+	}
+
+	if dm.Delete(10) == nil {
+		t.Errorf("Expected deleting ID 10 to fail")
+	}
+
+	if dm.Delete(5) != nil {
+		t.Errorf("Expected deleting ID 5 to succeed")
+	}
+	if dm.Contains(5) {
+		t.Errorf("Expected to not contain ID 5 after deletion")
+	}
+	if dm.Len() != 1 {
+		t.Errorf("Expected length to be 1 after deletion, got %d", dm.Len())
+	}
+}
+
+func TestClear(t *testing.T) {
+	dm := New[uint16, string](1, 5)
+	dm.Set(3, "3")
+	dm.Set(5, "5")
+
+	if dm.IsEmpty() {
+		t.Errorf("Expected to not be empty after adding elements")
+	}
+
+	dm.Clear()
+	if dm.Len() != 0 {
+		t.Errorf("Expected length to be 0 after clear, got %d", dm.Len())
+	}
+	if dm.Contains(3) || dm.Contains(5) {
+		t.Errorf("Expected to not contain any IDs after clear")
+	}
+
+	if !dm.IsEmpty() {
+		t.Errorf("Expected to be empty after clear")
+	}
+}
+
+func TestRange(t *testing.T) {
+	dm := New[uint16, string](1, 5)
+	dm.Set(3, "3")
+	dm.Set(5, "5")
+
+	count := 0
+	dm.Range(10, 0, func(id uint16, value string) {
+		if id != 3 && id != 5 {
+			t.Errorf("Expected ID to be 3 or 5, got %d", id)
+		}
+		if value != "3" && value != "5" {
+			t.Errorf("Expected value to be '3' or '5', got '%s'", value)
+		}
+		count++
+	})
+
+	if count != 2 {
+		t.Errorf("Expected Range to iterate 2 times, got %d", count)
+	}
+}
+
+func TestFirstLast(t *testing.T) {
+	dm := New[uint16, string](1, 5)
+	dm.Set(3, "3")
+	dm.Set(5, "5")
+
+	id, val := dm.First()
+	if id != 3 || val == nil || *val != "3" {
+		t.Errorf("Expected First to return (3, '3'), got (%d, '%v')", id, val)
+	}
+
+	id, val = dm.Last()
+	if id != 5 || val == nil || *val != "5" {
+		t.Errorf("Expected Last to return (5, '5'), got (%d, '%v')", id, val)
+	}
+
+	dm.Clear()
+	id, val = dm.First()
+	if id != 0 || val != nil {
+		t.Errorf("Expected First to return (0, nil) on empty map, got (%d, '%v')", id, val)
+	}
+	id, val = dm.Last()
+	if id != 0 || val != nil {
+		t.Errorf("Expected Last to return (0, nil) on empty map, got (%d, '%v')", id, val)
+	}
+}
