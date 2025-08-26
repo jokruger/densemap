@@ -83,3 +83,82 @@ func TestInt16(t *testing.T) {
 		}
 	}
 }
+
+func TestNew(t *testing.T) {
+	dm := New[uint16, string](5, 1)
+
+	if dm.GetMinID() != 1 {
+		t.Errorf("Expected min ID to be 1, got %d", dm.GetMinID())
+	}
+
+	if dm.GetMaxID() != 5 {
+		t.Errorf("Expected max ID to be 5, got %d", dm.GetMaxID())
+	}
+
+	if dm.Set(3, "3") != nil {
+		t.Errorf("Expected setting ID 3 to succeed")
+	}
+
+	if dm.Set(10, "10") == nil {
+		t.Errorf("Expected setting ID 10 to fail")
+	}
+
+	if dm.GetPtr(10) != nil {
+		t.Errorf("Expected getting ID 10 to return nil")
+	}
+
+	if dm.GetPtr(1) != nil {
+		t.Errorf("Expected getting ID 1 to return nil")
+	}
+
+	if dm.GetPtr(3) == nil {
+		t.Errorf("Expected getting ID 3 to return non-nil")
+	}
+}
+
+func TestGet(t *testing.T) {
+	dm := New[uint16, string](5, 1)
+
+	if dm.Set(3, "3") != nil {
+		t.Errorf("Expected setting ID 3 to succeed")
+	}
+
+	v, ok := dm.Get(3)
+	if !ok {
+		t.Errorf("Expected getting ID 3 to return ok")
+	}
+	if v != "3" {
+		t.Errorf("Expected getting ID 3 to return '3', got '%s'", v)
+	}
+
+	_, ok = dm.Get(10)
+	if ok {
+		t.Errorf("Expected getting ID 10 to return not ok")
+	}
+
+	if *dm.GetPtr(3) != "3" {
+		t.Errorf("Expected getting ID 3 to return '3', got '%v'", dm.GetPtr(3))
+	}
+}
+
+func TestForEach(t *testing.T) {
+	dm := New[uint16, string](1, 5)
+
+	dm.Set(3, "3")
+	dm.Set(5, "5")
+
+	count := 0
+	dm.ForEach(func(id uint16, value string) {
+		if id != 3 && id != 5 {
+			t.Errorf("Expected ID to be 3 or 5, got %d", id)
+		}
+		if value != "3" && value != "5" {
+			t.Errorf("Expected value to be '3' or '5', got '%s'", value)
+		}
+		count++
+	})
+
+	if count != 2 {
+		t.Errorf("Expected ForEach to iterate 2 times, got %d", count)
+	}
+}
