@@ -31,7 +31,7 @@ func BenchmarkIndex(b *testing.B) {
 			idx.Set(id, "123")
 		}
 		for id := 0; id < 1100; id++ {
-			_, _ = idx.Get(uint16(id))
+			_, _ = idx.Value(uint16(id))
 		}
 	}
 }

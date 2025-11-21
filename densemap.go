@@ -29,13 +29,13 @@ func New[ID Integer, T any](minID, maxID ID) *DenseMap[ID, T] {
 	}
 }
 
-// GetMinID returns the minimum ID in the DenseMap.
-func (dm *DenseMap[ID, T]) GetMinID() ID {
+// MinID returns the minimum ID in the DenseMap.
+func (dm *DenseMap[ID, T]) MinID() ID {
 	return dm.minID
 }
 
-// GetMaxID returns the maximum ID in the DenseMap.
-func (dm *DenseMap[ID, T]) GetMaxID() ID {
+// MaxID returns the maximum ID in the DenseMap.
+func (dm *DenseMap[ID, T]) MaxID() ID {
 	return dm.maxID
 }
 
@@ -68,8 +68,8 @@ func (dm *DenseMap[ID, T]) Delete(id ID) error {
 	return nil
 }
 
-// Get retrieves the value associated with the ID. Returns (value, true) if set, otherwise (zero, false).
-func (dm *DenseMap[ID, T]) Get(id ID) (T, bool) {
+// Value retrieves the value associated with the ID. Returns (value, true) if set, otherwise (zero, false).
+func (dm *DenseMap[ID, T]) Value(id ID) (T, bool) {
 	if id < dm.minID || id > dm.maxID {
 		var zero T
 		return zero, false
@@ -78,8 +78,8 @@ func (dm *DenseMap[ID, T]) Get(id ID) (T, bool) {
 	return dm.values[offset], dm.exists[offset]
 }
 
-// GetPtr retrieves pointer to the value associated with the ID. Returns *value if set, otherwise nil.
-func (dm *DenseMap[ID, T]) GetPtr(id ID) *T {
+// Ptr retrieves pointer to the value associated with the ID. Returns *value if set, otherwise nil.
+func (dm *DenseMap[ID, T]) Ptr(id ID) *T {
 	if id < dm.minID || id > dm.maxID {
 		return nil
 	}

@@ -30,14 +30,14 @@ func TestUint16(t *testing.T) {
 			if !idx.Contains(uint16(i)) {
 				t.Errorf("Expected to contain %d, but it does not", i)
 			}
-			if v, ok := idx.Get(uint16(i)); !ok || v != i {
+			if v, ok := idx.Value(uint16(i)); !ok || v != i {
 				t.Errorf("Expected to return %d for %d, got %v (ok: %v)", i, i, v, ok)
 			}
 		} else {
 			if idx.Contains(uint16(i)) {
 				t.Errorf("Expected to not contain %d, but it does", i)
 			}
-			if v, ok := idx.Get(uint16(i)); ok || v != 0 {
+			if v, ok := idx.Value(uint16(i)); ok || v != 0 {
 				t.Errorf("Expected to return zero for %d, got %v (ok: %v)", i, v, ok)
 			}
 		}
@@ -70,14 +70,14 @@ func TestInt16(t *testing.T) {
 			if !idx.Contains(int16(i)) {
 				t.Errorf("Expected to contain %d, but it does not", i)
 			}
-			if v, ok := idx.Get(int16(i)); !ok || v != i {
+			if v, ok := idx.Value(int16(i)); !ok || v != i {
 				t.Errorf("Expected to return %d for %d, got %v (ok: %v)", i, i, v, ok)
 			}
 		} else {
 			if idx.Contains(int16(i)) {
 				t.Errorf("Expected to not contain %d, but it does", i)
 			}
-			if v, ok := idx.Get(int16(i)); ok || v != 0 {
+			if v, ok := idx.Value(int16(i)); ok || v != 0 {
 				t.Errorf("Expected to return zero for %d, got %v (ok: %v)", i, v, ok)
 			}
 		}
@@ -87,12 +87,12 @@ func TestInt16(t *testing.T) {
 func TestNew(t *testing.T) {
 	dm := New[uint16, string](5, 1)
 
-	if dm.GetMinID() != 1 {
-		t.Errorf("Expected min ID to be 1, got %d", dm.GetMinID())
+	if dm.MinID() != 1 {
+		t.Errorf("Expected min ID to be 1, got %d", dm.MinID())
 	}
 
-	if dm.GetMaxID() != 5 {
-		t.Errorf("Expected max ID to be 5, got %d", dm.GetMaxID())
+	if dm.MaxID() != 5 {
+		t.Errorf("Expected max ID to be 5, got %d", dm.MaxID())
 	}
 
 	if dm.Set(3, "3") != nil {
@@ -103,27 +103,27 @@ func TestNew(t *testing.T) {
 		t.Errorf("Expected setting ID 10 to fail")
 	}
 
-	if dm.GetPtr(10) != nil {
+	if dm.Ptr(10) != nil {
 		t.Errorf("Expected getting ID 10 to return nil")
 	}
 
-	if dm.GetPtr(1) != nil {
+	if dm.Ptr(1) != nil {
 		t.Errorf("Expected getting ID 1 to return nil")
 	}
 
-	if dm.GetPtr(3) == nil {
+	if dm.Ptr(3) == nil {
 		t.Errorf("Expected getting ID 3 to return non-nil")
 	}
 }
 
-func TestGet(t *testing.T) {
+func TestValuePtr(t *testing.T) {
 	dm := New[uint16, string](5, 1)
 
 	if dm.Set(3, "3") != nil {
 		t.Errorf("Expected setting ID 3 to succeed")
 	}
 
-	v, ok := dm.Get(3)
+	v, ok := dm.Value(3)
 	if !ok {
 		t.Errorf("Expected getting ID 3 to return ok")
 	}
@@ -131,13 +131,13 @@ func TestGet(t *testing.T) {
 		t.Errorf("Expected getting ID 3 to return '3', got '%s'", v)
 	}
 
-	_, ok = dm.Get(10)
+	_, ok = dm.Value(10)
 	if ok {
 		t.Errorf("Expected getting ID 10 to return not ok")
 	}
 
-	if *dm.GetPtr(3) != "3" {
-		t.Errorf("Expected getting ID 3 to return '3', got '%v'", dm.GetPtr(3))
+	if *dm.Ptr(3) != "3" {
+		t.Errorf("Expected getting ID 3 to return '3', got '%v'", dm.Ptr(3))
 	}
 }
 
