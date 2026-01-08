@@ -20,7 +20,7 @@ func New[ID Integer, T any](minID, maxID ID) *DenseMap[ID, T] {
 	if minID > maxID {
 		minID, maxID = maxID, minID
 	}
-	size := int(maxID - minID + 1)
+	size := int(maxID) - int(minID) + 1
 	return &DenseMap[ID, T]{
 		minID:  minID,
 		maxID:  maxID,
@@ -44,7 +44,7 @@ func (dm *DenseMap[ID, T]) Set(id ID, value T) error {
 	if id < dm.minID || id > dm.maxID {
 		return fmt.Errorf("ID %v out of range [%v, %v]", id, dm.minID, dm.maxID)
 	}
-	offset := int(id - dm.minID)
+	offset := int(id) - int(dm.minID)
 	if !dm.exists[offset] {
 		dm.count++
 	}
@@ -58,7 +58,7 @@ func (dm *DenseMap[ID, T]) Delete(id ID) error {
 	if id < dm.minID || id > dm.maxID {
 		return fmt.Errorf("ID %v out of range [%v, %v]", id, dm.minID, dm.maxID)
 	}
-	offset := int(id - dm.minID)
+	offset := int(id) - int(dm.minID)
 	if dm.exists[offset] {
 		dm.exists[offset] = false
 		var zero T
@@ -74,7 +74,7 @@ func (dm *DenseMap[ID, T]) Value(id ID) (T, bool) {
 		var zero T
 		return zero, false
 	}
-	offset := int(id - dm.minID)
+	offset := int(id) - int(dm.minID)
 	return dm.values[offset], dm.exists[offset]
 }
 
@@ -83,7 +83,7 @@ func (dm *DenseMap[ID, T]) Ptr(id ID) *T {
 	if id < dm.minID || id > dm.maxID {
 		return nil
 	}
-	offset := int(id - dm.minID)
+	offset := int(id) - int(dm.minID)
 	if !dm.exists[offset] {
 		return nil
 	}
@@ -110,7 +110,7 @@ func (dm *DenseMap[ID, T]) Contains(id ID) bool {
 	if id < dm.minID || id > dm.maxID {
 		return false
 	}
-	offset := int(id - dm.minID)
+	offset := int(id) - int(dm.minID)
 	return dm.exists[offset]
 }
 
@@ -146,7 +146,7 @@ func (dm *DenseMap[ID, T]) Range(min, max ID, fn func(id ID, value T)) {
 		max = dm.maxID
 	}
 	for id := min; id <= max; id++ {
-		offset := int(id - dm.minID)
+		offset := int(id) - int(dm.minID)
 		if dm.exists[offset] {
 			fn(id, dm.values[offset])
 		}
